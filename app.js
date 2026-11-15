@@ -1,9 +1,34 @@
 const SITE_PRESETS = {
-  shackleton: { name: 'Shackleton rim', lat: -89.0, lon: 0.0, phase: 0.15, ridge: 7.0, ridgeAz: 35 },
-  malapert: { name: 'Malapert massif', lat: -85.0, lon: 20.0, phase: 1.0, ridge: 4.0, ridgeAz: 215 },
-  gerlache: { name: 'de Gerlache region', lat: -88.0, lon: -25.0, phase: 2.15, ridge: 10.0, ridgeAz: 290 },
-  customA: { name: 'Custom site A', lat: -89.0, lon: 0.0, phase: 0.4, ridge: 5.0, ridgeAz: 95 },
-  customB: { name: 'Custom site B', lat: -85.0, lon: 20.0, phase: 1.4, ridge: 6.0, ridgeAz: 255 }
+  shackleton: {
+    name: 'Shackleton Crater',
+    lat: -89.67,
+    lon: 129.78,
+    horizon: null
+  },
+  cabeus: {
+    name: 'Cabeus Crater',
+    lat: -85.3303,
+    lon: 317.8673,
+    horizon: null
+  },
+  mouton: {
+    name: 'Mons Mouton',
+    lat: -84.6,
+    lon: 31.0,
+    horizon: null
+  },
+  customA: {
+    name: 'Custom site A',
+    lat: -89.0,
+    lon: 0.0,
+    horizon: null
+  },
+  customB: {
+    name: 'Custom site B',
+    lat: -85.0,
+    lon: 20.0,
+    horizon: null
+  }
 };
 
 const $ = (id) => document.getElementById(id);
@@ -336,9 +361,14 @@ $('timeSlider').addEventListener('input', event => {
 });
 $('exportButton').addEventListener('click', exportCSV);
 $('resetButton').addEventListener('click', () => {
-  $('siteA').value = 'shackleton'; $('siteB').value = 'malapert';
-  $('latA').value = '-89.000'; $('lonA').value = '0.000';
-  $('latB').value = '-85.000'; $('lonB').value = '20.000';
+  
+  $('siteA').value = 'shackleton';
+  $('siteB').value = 'cabeus';
+  
+  $('latA').value = SITE_PRESETS.shackleton.lat;
+  $('lonA').value = SITE_PRESETS.shackleton.lon;
+  $('latB').value = SITE_PRESETS.cabeus.lat;
+  $('lonB').value = SITE_PRESETS.cabeus.lon;
   $('startDate').value = '2026-11-14'; $('startTime').value = '00:00';
   $('duration').value = '168'; $('stepMinutes').value = '30';
   updateAll();

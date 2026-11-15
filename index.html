@@ -41,19 +41,21 @@
           <label class="field field-site">
             <span class="field-label">Scenario A · landing site</span>
             <select id="siteA">
-              <option value="shackleton">Shackleton rim · demo site</option>
-              <option value="malapert">Malapert massif · demo site</option>
-              <option value="gerlache">de Gerlache region · demo site</option>
-              <option value="customA">Custom coordinates</option>
+              <option value="shackleton">Shackleton Crater</option>
+              <option value="cabeus">Cabeus Crater</option>
+              <option value="mouton">Mons Mouton</option>
+              <option value="CustomA">Custom Site A</option>
+              <option value="customB">Custom Site B</option>
             </select>
           </label>
           <label class="field field-site">
             <span class="field-label">Scenario B · comparison site</span>
             <select id="siteB">
-              <option value="malapert">Malapert massif · demo site</option>
-              <option value="shackleton">Shackleton rim · demo site</option>
-              <option value="gerlache">de Gerlache region · demo site</option>
-              <option value="customB">Custom coordinates</option>
+              <option value="shackleton">Shackleton Crater</option>
+              <option value="cabeus">Cabeus Crater</option>
+              <option value="mouton">Mons Mouton</option>
+              <option value="customA">Custom Site A</option>
+              <option value="customB">Custom Site B</option>
             </select>
           </label>
           <label class="field">
@@ -84,8 +86,8 @@
         <div class="coordinate-row">
           <div class="coordinate-title">Site coordinates <span class="muted">· east longitude, planetocentric latitude</span></div>
           <div class="coordinate-fields">
-            <div class="coordinate-group"><span class="coordinate-name">A</span><label>Lat <input id="latA" type="number" min="-90" max="90" step="0.001" value="-89.000" /></label><label>Lon <input id="lonA" type="number" min="-180" max="180" step="0.001" value="0.000" /></label></div>
-            <div class="coordinate-group"><span class="coordinate-name">B</span><label>Lat <input id="latB" type="number" min="-90" max="90" step="0.001" value="-85.000" /></label><label>Lon <input id="lonB" type="number" min="-180" max="180" step="0.001" value="20.000" /></label></div>
+            <div class="coordinate-group"><span class="coordinate-name">A</span><label>Lat <input id="latA" type="number" min="-90" max="90" step="0.001" value="-89.000" /></label><label>Lon <input id="lonA" type="number" min="0" max="360" step="0.001" value="129.780" /></label></div>
+            <div class="coordinate-group"><span class="coordinate-name">B</span><label>Lat <input id="latB" type="number" min="-90" max="90" step="0.001" value="-85.000" /></label><label>Lon <input id="lonB" type="number" min="0" max="360" step="0.001" value="317.867" /></label></div>
             <button class="button button-outline" id="applyButton" type="button">Apply scenarios <span>→</span></button>
           </div>
           <p class="input-note">Preset coordinates are placeholders for interface testing. Replace them with verified mission coordinates before doing scientific analysis.</p>
@@ -116,7 +118,7 @@
 
         <aside class="panel metrics-panel">
           <div class="section-heading"><div><span class="section-index">03</span><h2>Mission indicators</h2></div></div>
-          <div class="metric-intro">Scenario A <span id="metricSiteName">Shackleton rim</span></div>
+          <div class="metric-intro">Scenario A <span id="metricSiteName">Shackleton Crater</span></div>
           <div class="metric-card metric-solar"><div class="metric-top"><span>Sunlight</span><span class="metric-pill">POWER</span></div><div class="metric-value"><strong id="sunHours">—</strong><span>hours</span></div><p>Estimated terrain-visible time during this evaluation period.</p><div class="metric-foot"><span>Longest continuous window</span><strong id="sunLongest">—</strong></div></div>
           <div class="metric-card metric-comms"><div class="metric-top"><span>Earth visibility</span><span class="metric-pill">COMMS</span></div><div class="metric-value"><strong id="earthHours">—</strong><span>hours</span></div><p>Geometric line-of-sight time before link-budget constraints.</p><div class="metric-foot"><span>Longest continuous window</span><strong id="earthLongest">—</strong></div></div>
           <div class="metric-footprint"><span class="footprint-label">CURRENT POSITION</span><div><span id="currentLat">−89.000°</span><span id="currentLon">0.000° E</span></div></div>
@@ -133,8 +135,8 @@
       <section class="panel comparison-panel">
         <div class="section-heading"><div><span class="section-index">05</span><h2>Scenario comparison</h2></div><span class="section-note">SAME DATE & EVALUATION PERIOD</span></div>
         <div class="comparison-grid">
-          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter">A</span><div><strong id="compareNameA">Shackleton rim</strong><small id="compareCoordsA">89.000° S · 0.000° E</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunA">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthA">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakA">—</strong></div></div>
-          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter scenario-b">B</span><div><strong id="compareNameB">Malapert massif</strong><small id="compareCoordsB">85.000° S · 20.000° E</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunB">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthB">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakB">—</strong></div></div>
+          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter">A</span><div><strong id="compareNameA">Shackleton Crater</strong><small id="compareCoordsA">89.000° S · 0.000° E</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunA">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthA">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakA">—</strong></div></div>
+          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter scenario-b">B</span><div><strong id="compareNameB">Cabeus Crater</strong><small id="compareCoordsB">85.000° S · 20.000° E</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunB">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthB">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakB">—</strong></div></div>
         </div>
       </section>
 
