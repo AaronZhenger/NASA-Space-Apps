@@ -117,6 +117,51 @@
         </div>
       </section>
 
+      <section class="panel score-panel">
+        <div class="section-heading">
+          <div>
+            <span class="section-index">06</span>
+            <h2>Site suitability ranking</h2>
+          </div>
+          <span class="section-note">WEIGHTED MODEL · 0–100</span>
+        </div>
+      
+        <p class="score-description">
+          Candidate sites are ranked using terrain-adjusted sunlight,
+          geometric Earth visibility, and horizon openness over the selected period.
+        </p>
+      
+        <div class="score-equation">
+          Score = 0.40(Sunlight) + 0.30(Earth visibility) + 0.30(Terrain)
+        </div>
+      
+        <div class="table-wrap">
+          <table class="score-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Candidate site</th>
+                <th>Overall score</th>
+                <th>Sunlight</th>
+                <th>Earth visibility</th>
+                <th>Terrain</th>
+              </tr>
+            </thead>
+            <tbody id="scoreTableBody">
+              <tr><td colspan="6">Calculating site scores…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      
+        <p class="score-footnote">
+          Scores are comparative screening indicators, not probabilities of
+          mission success. Terrain openness uses the fraction of azimuth bins
+          with horizon angles ≤ 5°. Results depend on the selected evaluation period.
+
+          The overall score is a weighted screening metric combining sunlight availability (40%), geometric Earth visibility (30%), and terrain openness (30%). Individual metrics are normalized to a 0–100 scale. Scores support relative comparison between candidate sites and do not represent mission safety probabilities or final landing-site suitability.
+        </p>
+      </section>
+
       <section class="notice-row">
         <div class="notice-icon">i</div>
         <div><strong>Preliminary analysis notice</strong><p>Ephemeris positions are from JPL Horizons and terrain obstruction is derived from the supplied DEMs. Results remain preliminary until the DEM horizontal orientation, vertical datum, observer-point selection, and horizon calculation are independently validated. Earth visibility is geometric line of sight, not proof of an operational communications link.</p></div>

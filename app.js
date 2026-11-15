@@ -7,7 +7,8 @@ const SITE_PRESETS = {
 };
 const $ = id => document.getElementById(id);
 const state = {
-  seriesA: [], seriesB: [], index: 0, siteA: null, siteB: null,
+  seriesA: [], seriesB: [], ranking: [], index: 0,
+  siteA: null, siteB: null,
   start: null, durationHours: 168, stepMinutes: 30, requestId: 0
 };
 const siteCache = {};
@@ -149,6 +150,54 @@ function summarize(points, key) {
   }
   return { visibleHours, longest:Math.max(longest, current), peak };
 }
+function calculateSiteScore(site, points, durationHours) {
+  const sun = summarize(points, 'sun');
+  const earth = summarize(points, 'earth');
+
+  // Percentage of evaluation time with unobstructed visibility.
+  const sunScore = clamp(
+    sun.visibleHours / durationHours * 100, 0, 100
+  );
+
+  const earthScore = clamp(
+    earth.visibleHours / durationHours * 100, 0, 100
+  );
+
+  // Percentage of horizon directions with obstruction <= 5 degrees.
+  const openDirections = site.horizonDeg.filter(
+    angle => Number.isFinite(Number(angle)) && Number(angle) <= 5
+  ).length;
+
+  const terrainScore = openDirections / site.horizonDeg.length * 100;
+
+  const totalScore =
+    0.40 * sunScore +
+    0.30 * earthScore +
+    0.30 * terrainScore;
+
+  return {
+    id: site.id,
+    name: site.name,
+    score: totalScore,
+    sun: sunScore,
+    earth: earthScore,
+    terrain: terrainScore
+  };
+}
+function updateScoreboard() {
+  const body = $('scoreTableBody');
+
+  body.innerHTML = state.ranking.map((site, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${site.name}</td>
+      <td class="score-value">${site.score.toFixed(1)}/100</td>
+      <td>${site.sun.toFixed(1)}%</td>
+      <td>${site.earth.toFixed(1)}%</td>
+      <td>${site.terrain.toFixed(1)}%</td>
+    </tr>
+  `).join('');
+}
 function updateCoordinateFields() {
   for (const [which, site] of [['A',state.siteA],['B',state.siteB]]) {
     $(`lat${which}`).value = Number(site.lat).toFixed(3);
@@ -156,32 +205,90 @@ function updateCoordinateFields() {
   }
 }
 let activeRequest = 0;
+
 async function updateAll() {
   const request = ++activeRequest;
   const start = getStartDate();
-  if (Number.isNaN(start.getTime())) { setStatus('INVALID DATE','Check the selected UTC date and time.',true); return; }
+
+  if (Number.isNaN(start.getTime())) {
+    setStatus('INVALID DATE', 'Check the selected UTC date and time.', true);
+    return;
+  }
+
   state.start = start;
   state.durationHours = Number($('duration').value);
   state.stepMinutes = Number($('stepMinutes').value);
-  setStatus('LOADING DATA','Loading DEM horizon and Horizons ephemeris…');
+
+  setStatus('LOADING DATA', 'Calculating all candidate sites…');
+
   try {
-    const idA = $('siteA').value, idB = $('siteB').value;
-    const [a,b] = await Promise.all([loadSiteData(idA),loadSiteData(idB)]);
+    const ids = Object.keys(SITE_PRESETS);
+
+    const datasets = await Promise.all(
+      ids.map(id => loadSiteData(id))
+    );
+
     if (request !== activeRequest) return;
-    state.siteA = a; state.siteB = b;
-    state.siteA.name = SITE_PRESETS[idA]; state.siteB.name = SITE_PRESETS[idB];
-    state.seriesA = generateSeries(a,start,state.durationHours,state.stepMinutes);
-    state.seriesB = generateSeries(b,start,state.durationHours,state.stepMinutes);
+
+    const results = ids.map((id, index) => {
+      const site = datasets[index];
+      site.id = id;
+      site.name = SITE_PRESETS[id];
+
+      const points = generateSeries(
+        site,
+        start,
+        state.durationHours,
+        state.stepMinutes
+      );
+
+      return {
+        site,
+        points,
+        score: calculateSiteScore(
+          site,
+          points,
+          state.durationHours
+        )
+      };
+    });
+
+    state.ranking = results
+      .map(result => result.score)
+      .sort((a, b) => b.score - a.score);
+
+    const idA = $('siteA').value;
+    const idB = $('siteB').value;
+
+    const resultA = results.find(r => r.site.id === idA);
+    const resultB = results.find(r => r.site.id === idB);
+
+    state.siteA = resultA.site;
+    state.siteB = resultB.site;
+    state.seriesA = resultA.points;
+    state.seriesB = resultB.points;
+
     state.index = 0;
+
     $('timeSlider').max = String(state.seriesA.length - 1);
     $('timeSlider').value = '0';
+
     updateCoordinateFields();
     updateLabelsAndMetrics();
+    updateScoreboard();
     drawAll();
-    setStatus('DATA LOADED','JPL Horizons ephemeris + DEM-derived horizon · preliminary');
+
+    setStatus(
+      'DATA LOADED',
+      '9 candidate sites evaluated · preliminary model'
+    );
+
   } catch (error) {
     console.error(error);
-    if (request === activeRequest) setStatus('DATA UNAVAILABLE',error.message,true);
+
+    if (request === activeRequest) {
+      setStatus('DATA UNAVAILABLE', error.message, true);
+    }
   }
 }
 function updateLabelsAndMetrics() {
