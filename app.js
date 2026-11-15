@@ -154,7 +154,6 @@ function calculateSiteScore(site, points, durationHours) {
   const sun = summarize(points, 'sun');
   const earth = summarize(points, 'earth');
 
-  // Percentage of evaluation time with unobstructed visibility.
   const sunScore = clamp(
     sun.visibleHours / durationHours * 100, 0, 100
   );
@@ -163,7 +162,6 @@ function calculateSiteScore(site, points, durationHours) {
     earth.visibleHours / durationHours * 100, 0, 100
   );
 
-  // Percentage of horizon directions with obstruction <= 5 degrees.
   const openDirections = site.horizonDeg.filter(
     angle => Number.isFinite(Number(angle)) && Number(angle) <= 5
   ).length;
