@@ -1,23 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f6f7f8" />
-  <meta name="description" content="LunarWindow — a starter dashboard for comparing lunar south-pole lighting and Earth visibility." />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f8">
+  <meta name="description" content="LunarWindow compares lunar south-pole terrain illumination and geometric Earth visibility.">
   <title>LunarWindow · Lunar Site Analysis</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="#top" aria-label="LunarWindow home">
-        <span class="brand-name">LunarWindow</span>
-      </a>
+      <a class="brand" href="#top" aria-label="LunarWindow home"><span class="brand-name">LunarWindow</span></a>
       <div class="topbar-right">
         <span class="mission-tag">Lunar south pole analysis</span>
-        <button class="button button-quiet theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false">Dark mode</button>
-        <button class="button button-quiet" id="resetButton" type="button">Reset demo</button>
+        <button class="button button-quiet theme-toggle" id="themeToggle" type="button">Dark mode</button>
+        <button class="button button-quiet" id="resetButton" type="button">Reset</button>
         <button class="button button-primary" id="exportButton" type="button">Export CSV</button>
       </div>
     </header>
@@ -27,9 +25,12 @@
         <div>
           <div class="eyebrow">Lunar south pole · environmental analysis</div>
           <h1>Compare lunar landing sites.</h1>
-          <p class="intro-copy">Compare surface lighting and direct-to-Earth visibility as mission locations and dates change.</p>
+          <p class="intro-copy">Compare terrain-adjusted sunlight and geometric Earth visibility across candidate sites.</p>
         </div>
-        <div class="data-status"><span class="status-dot"></span><div><strong>DEMO MODE</strong><small>Illustrative data · not for mission decisions</small></div></div>
+        <div class="data-status" id="dataStatus">
+          <span class="status-dot"></span>
+          <div><strong id="statusTitle">LOADING DATA</strong><small id="statusDetail">Waiting for site datasets</small></div>
+        </div>
       </section>
 
       <section class="control-panel panel" aria-labelledby="scenario-heading">
@@ -38,114 +39,90 @@
           <span class="section-note">ADJUST PARAMETERS</span>
         </div>
         <div class="controls-grid">
-          <label class="field field-site">
-            <span class="field-label">Scenario A · landing site</span>
+          <label class="field field-site"><span class="field-label">Scenario A · landing site</span>
             <select id="siteA">
-              <option value="shackleton">Shackleton Crater</option>
-              <option value="cabeus">Cabeus Crater</option>
-              <option value="mouton">Mons Mouton</option>
-              <option value="CustomA">Custom Site A</option>
-              <option value="customB">Custom Site B</option>
+              <option value="Site01">Site 01</option><option value="Site04">Site 04</option>
+              <option value="Site06">Site 06</option><option value="Site07">Site 07</option>
+              <option value="Site11">Site 11</option><option value="Site20">Site 20</option>
+              <option value="Site20v2">Site 20 v2</option><option value="Site23">Site 23</option>
+              <option value="Site42">Site 42</option>
             </select>
           </label>
-          <label class="field field-site">
-            <span class="field-label">Scenario B · comparison site</span>
+          <label class="field field-site"><span class="field-label">Scenario B · comparison site</span>
             <select id="siteB">
-              <option value="shackleton">Shackleton Crater</option>
-              <option value="cabeus">Cabeus Crater</option>
-              <option value="mouton">Mons Mouton</option>
-              <option value="customA">Custom Site A</option>
-              <option value="customB">Custom Site B</option>
+              <option value="Site01">Site 01</option><option value="Site04" selected>Site 04</option>
+              <option value="Site06">Site 06</option><option value="Site07">Site 07</option>
+              <option value="Site11">Site 11</option><option value="Site20">Site 20</option>
+              <option value="Site20v2">Site 20 v2</option><option value="Site23">Site 23</option>
+              <option value="Site42">Site 42</option>
             </select>
           </label>
-          <label class="field">
-            <span class="field-label">Start date (UTC)</span>
-            <input id="startDate" type="date" value="2026-11-14" />
+          <label class="field"><span class="field-label">Start date (UTC)</span><input id="startDate" type="date" value="2026-11-15"></label>
+          <label class="field"><span class="field-label">Start time (UTC)</span><input id="startTime" type="time" value="00:00"></label>
+          <label class="field"><span class="field-label">Evaluation period</span>
+            <select id="duration"><option value="24">24 hours</option><option value="168" selected>7 Earth days</option><option value="708">29.5 Earth days</option></select>
           </label>
-          <label class="field">
-            <span class="field-label">Start time (UTC)</span>
-            <input id="startTime" type="time" value="00:00" />
-          </label>
-          <label class="field">
-            <span class="field-label">Evaluation period</span>
-            <select id="duration">
-              <option value="24">24 hours</option>
-              <option value="168" selected>7 Earth days</option>
-              <option value="708">29.5 Earth days</option>
-            </select>
-          </label>
-          <label class="field">
-            <span class="field-label">Time step</span>
-            <select id="stepMinutes">
-              <option value="10">10 minutes</option>
-              <option value="30" selected>30 minutes</option>
-              <option value="60">1 hour</option>
-            </select>
+          <label class="field"><span class="field-label">Time step</span>
+            <select id="stepMinutes"><option value="10">10 minutes</option><option value="30" selected>30 minutes</option><option value="60">1 hour</option></select>
           </label>
         </div>
         <div class="coordinate-row">
-          <div class="coordinate-title">Site coordinates <span class="muted">· east longitude, planetocentric latitude</span></div>
+          <div class="coordinate-title">Dataset coordinates <span class="muted">· east longitude, south-positive latitude display convention not used</span></div>
           <div class="coordinate-fields">
-            <div class="coordinate-group"><span class="coordinate-name">A</span><label>Lat <input id="latA" type="number" min="-90" max="90" step="0.001" value="-89.000" /></label><label>Lon <input id="lonA" type="number" min="0" max="360" step="0.001" value="129.780" /></label></div>
-            <div class="coordinate-group"><span class="coordinate-name">B</span><label>Lat <input id="latB" type="number" min="-90" max="90" step="0.001" value="-85.000" /></label><label>Lon <input id="lonB" type="number" min="0" max="360" step="0.001" value="317.867" /></label></div>
+            <div class="coordinate-group"><span class="coordinate-name">A</span><label>Lat <input id="latA" type="number" readonly></label><label>Lon <input id="lonA" type="number" readonly></label></div>
+            <div class="coordinate-group"><span class="coordinate-name">B</span><label>Lat <input id="latB" type="number" readonly></label><label>Lon <input id="lonB" type="number" readonly></label></div>
             <button class="button button-outline" id="applyButton" type="button">Apply scenarios <span>→</span></button>
           </div>
-          <p class="input-note">Preset coordinates are placeholders for interface testing. Replace them with verified mission coordinates before doing scientific analysis.</p>
+          <p class="input-note">Coordinates are the representative DEM sample locations generated for each dataset, not independently verified landing coordinates.</p>
         </div>
       </section>
 
       <section class="main-grid">
         <article class="panel horizon-panel">
-          <div class="section-heading">
-            <div><span class="section-index">02</span><h2>Local sky & terrain horizon</h2></div>
-            <span class="live-time" id="selectedTimestamp">14 NOV 2026 · 00:00 UTC</span>
-          </div>
-          <div class="chart-toolbar">
-            <div class="legend"><span><i class="legend-sun"></i> Sun</span><span><i class="legend-earth"></i> Earth</span><span><i class="legend-terrain"></i> Terrain horizon</span></div>
-            <span class="chart-unit">AZIMUTH → / ELEVATION ↑</span>
-          </div>
-          <div class="horizon-wrap"><canvas id="horizonCanvas" aria-label="Horizon plot showing terrain obstruction and the current apparent positions of the Sun and Earth"></canvas></div>
+          <div class="section-heading"><div><span class="section-index">02</span><h2>Local sky & terrain horizon</h2></div><span class="live-time" id="selectedTimestamp">—</span></div>
+          <div class="chart-toolbar"><div class="legend"><span><i class="legend-sun"></i> Sun</span><span><i class="legend-earth"></i> Earth</span><span><i class="legend-terrain"></i> Terrain horizon</span></div><span class="chart-unit">AZIMUTH → / ELEVATION ↑</span></div>
+          <div class="horizon-wrap"><canvas id="horizonCanvas" aria-label="Terrain horizon and current Sun and Earth positions"></canvas></div>
           <div class="object-readouts">
             <div class="object-readout sun-readout"><div><span class="object-name">SUN · SCENARIO A</span><strong id="sunReadout">—</strong><small id="sunVisibility">Waiting for calculation</small></div></div>
             <div class="object-readout earth-readout"><div><span class="object-name">EARTH · SCENARIO A</span><strong id="earthReadout">—</strong><small id="earthVisibility">Waiting for calculation</small></div></div>
           </div>
           <div class="time-control">
-            <div class="time-control-top"><label for="timeSlider">Move through evaluation period</label><span id="elapsedLabel">00:00 / 168:00</span></div>
-            <input id="timeSlider" type="range" min="0" max="100" value="0" step="1" />
+            <div class="time-control-top"><label for="timeSlider">Move through evaluation period</label><span id="elapsedLabel">—</span></div>
+            <input id="timeSlider" type="range" min="0" max="1" value="0" step="1">
             <div class="range-labels"><span id="rangeStart">START</span><span>DRAG TO SCRUB TIME</span><span id="rangeEnd">END</span></div>
           </div>
         </article>
 
         <aside class="panel metrics-panel">
           <div class="section-heading"><div><span class="section-index">03</span><h2>Mission indicators</h2></div></div>
-          <div class="metric-intro">Scenario A <span id="metricSiteName">Shackleton Crater</span></div>
-          <div class="metric-card metric-solar"><div class="metric-top"><span>Sunlight</span><span class="metric-pill">POWER</span></div><div class="metric-value"><strong id="sunHours">—</strong><span>hours</span></div><p>Estimated terrain-visible time during this evaluation period.</p><div class="metric-foot"><span>Longest continuous window</span><strong id="sunLongest">—</strong></div></div>
-          <div class="metric-card metric-comms"><div class="metric-top"><span>Earth visibility</span><span class="metric-pill">COMMS</span></div><div class="metric-value"><strong id="earthHours">—</strong><span>hours</span></div><p>Geometric line-of-sight time before link-budget constraints.</p><div class="metric-foot"><span>Longest continuous window</span><strong id="earthLongest">—</strong></div></div>
-          <div class="metric-footprint"><span class="footprint-label">CURRENT POSITION</span><div><span id="currentLat">−89.000°</span><span id="currentLon">0.000° E</span></div></div>
+          <div class="metric-intro">Scenario A <span id="metricSiteName">—</span></div>
+          <div class="metric-card metric-solar"><div class="metric-top"><span>Sunlight</span><span class="metric-pill">POWER</span></div><div class="metric-value"><strong id="sunHours">—</strong><span>hours</span></div><p>Estimated terrain-visible time in this evaluation period.</p><div class="metric-foot"><span>Longest continuous window</span><strong id="sunLongest">—</strong></div></div>
+          <div class="metric-card metric-comms"><div class="metric-top"><span>Earth visibility</span><span class="metric-pill">COMMS</span></div><div class="metric-value"><strong id="earthHours">—</strong><span>hours</span></div><p>Geometric line-of-sight time; not a communications link analysis.</p><div class="metric-foot"><span>Longest continuous window</span><strong id="earthLongest">—</strong></div></div>
+          <div class="metric-footprint"><span class="footprint-label">CURRENT POSITION</span><div><span id="currentLat">—</span><span id="currentLon">—</span></div></div>
         </aside>
       </section>
 
       <section class="panel timeline-panel">
         <div class="section-heading"><div><span class="section-index">04</span><h2>Visibility timeline</h2></div><span class="section-note">SCENARIO A · ELEVATION ABOVE LOCAL HORIZONTAL</span></div>
         <div class="timeline-legend"><span><i class="line-sun"></i> Sun elevation</span><span><i class="line-earth"></i> Earth elevation</span><span><i class="line-zero"></i> 0° reference</span></div>
-        <div class="timeline-wrap"><canvas id="timelineCanvas" aria-label="Time-series chart of Sun and Earth elevation throughout the selected evaluation period"></canvas></div>
+        <div class="timeline-wrap"><canvas id="timelineCanvas" aria-label="Sun and Earth elevation over time"></canvas></div>
         <div class="timeline-footer"><span id="timelineStart">START</span><span>TIME →</span><span id="timelineEnd">END</span></div>
       </section>
 
       <section class="panel comparison-panel">
         <div class="section-heading"><div><span class="section-index">05</span><h2>Scenario comparison</h2></div><span class="section-note">SAME DATE & EVALUATION PERIOD</span></div>
         <div class="comparison-grid">
-          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter">A</span><div><strong id="compareNameA">Shackleton Crater</strong><small id="compareCoordsA">89.000° S · 0.000° E</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunA">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthA">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakA">—</strong></div></div>
-          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter scenario-b">B</span><div><strong id="compareNameB">Cabeus Crater</strong><small id="compareCoordsB">85.000° S · 20.000° E</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunB">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthB">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakB">—</strong></div></div>
+          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter">A</span><div><strong id="compareNameA">—</strong><small id="compareCoordsA">—</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunA">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthA">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakA">—</strong></div></div>
+          <div class="scenario-column"><div class="scenario-heading"><span class="scenario-letter scenario-b">B</span><div><strong id="compareNameB">—</strong><small id="compareCoordsB">—</small></div></div><div class="comparison-stat"><span>Sun-visible time</span><strong id="compareSunB">—</strong></div><div class="comparison-stat"><span>Earth-visible time</span><strong id="compareEarthB">—</strong></div><div class="comparison-stat"><span>Peak Sun elevation</span><strong id="comparePeakB">—</strong></div></div>
         </div>
       </section>
 
       <section class="notice-row">
         <div class="notice-icon">i</div>
-        <div><strong>Prototype data notice</strong><p>This starter currently generates synthetic positions and a simplified terrain horizon so you can build the interface and interaction model. It does not query JPL Horizons or use LOLA elevation data yet. Do not interpret the displayed metrics as real lunar predictions.</p></div>
+        <div><strong>Preliminary analysis notice</strong><p>Ephemeris positions are from JPL Horizons and terrain obstruction is derived from the supplied DEMs. Results remain preliminary until the DEM horizontal orientation, vertical datum, observer-point selection, and horizon calculation are independently validated. Earth visibility is geometric line of sight, not proof of an operational communications link.</p></div>
       </section>
     </main>
-    <footer><span>LunarWindow · frontend prototype</span><span>Data shown is illustrative</span></footer>
+    <footer><span>LunarWindow · preliminary analysis</span><span>Verify datasets before scientific or mission use</span></footer>
   </div>
   <script src="app.js"></script>
 </body>
